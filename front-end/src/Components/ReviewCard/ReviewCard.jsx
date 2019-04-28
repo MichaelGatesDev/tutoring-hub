@@ -17,15 +17,15 @@ class ReviewCard extends Component {
 			this.props.filter_course === ""
 				? this.props.tutor.reviews
 				: this.props.tutor.reviews.filter(review => {
-						return review.course === this.props.filter_course;
-				  });
+					return review.course === this.props.filter_course;
+				});
 
 		// const rating_filter_reviews = this.props.filter_rating === 0 ?
 		//     course_filter_reviews
 		//     :
 		//     course_filter_reviews.filter(review => {
 		//         let obj = review.statistics;
-		//         let total = (obj.methodology + obj.organization + obj.preparation + obj.knowlege + obj.clarity) / 5;
+		//         let total = (obj.methodology + obj.organization + obj.preparation + obj.knowledge + obj.clarity) / 5;
 		//         return total >= this.props.filter_rating;
 		//     })
 
@@ -37,7 +37,7 @@ class ReviewCard extends Component {
 				(obj.methodology +
 					obj.organization +
 					obj.preparation +
-					obj.knowlege +
+					obj.knowledge +
 					obj.clarity) /
 				5;
 

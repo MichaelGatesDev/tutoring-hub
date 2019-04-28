@@ -25,7 +25,7 @@ const NavBar = props => {
 					<img src={tutoringHubLogo} alt="Tutoring Hub Logo" />
 				</Link>
 				{props.searchable && <SearchBar handleSearch={props.handleSearch} />}
-				<Contact />
+				<UserBox />
 			</div>
 		</nav>
 	);

@@ -20,13 +20,26 @@ class UserBox extends Component {
     }
 
     onLoginSuccess(response) {
-        console.log(response);
 
-        fetch('/api/v1/auth/google', {
+        let idToken = response.tokenId;
+
+        fetch('/api/v1/auth/google/login', {
             method: "POST",
-            body: {}
-        }).then(response => {
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                token: idToken
+            })
         })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+            })
+            .catch(error => {
+                console.log(error);
+            });
     }
 
     onLoginFailure(response) {
