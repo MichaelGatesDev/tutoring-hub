@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import './UserBox.css';
 
 import { GoogleLogin, GoogleLogout } from 'react-google-login';
@@ -10,19 +10,29 @@ class UserBox extends Component {
 
         this.state = {
             authenticated: false,
-            user: undefined,
-            token: undefined
+            user: undefined
         };
+
+        this.onLoginSuccess = this.onLoginSuccess.bind(this);
+        this.onLoginFailure = this.onLoginFailure.bind(this);
+        this.onLogoutSuccess = this.onLogoutSuccess.bind(this);
+        this.onLogoutFailure = this.onLogoutFailure.bind(this);
     }
 
     componentDidMount() {
 
     }
 
-    onLoginSuccess(response) {
+    componentWillMount() {
+        let idToken = localStorage.getItem('idToken');
+        if (idToken) {
+            // console.log("Found cached id token");
+            this.performGoogleLogin(idToken);
+        }
+    }
 
-        let idToken = response.tokenId;
-
+    performGoogleLogin(idToken) {
+        // console.log("Performing login with token: " + idToken);
         fetch('/api/v1/auth/google/login', {
             method: "POST",
             headers: {
@@ -34,42 +44,68 @@ class UserBox extends Component {
             })
         })
             .then(response => response.json())
-            .then(data => {
-                console.log(data);
+            .then(user => {
+                localStorage.setItem('idToken', idToken);
+                this.setState({
+                    authenticated: true,
+                    user: user
+                });
             })
             .catch(error => {
                 console.log(error);
             });
     }
 
+    performGoogleLogout() {
+        console.log("Performing log out");
+        localStorage.removeItem('idToken');
+        this.setState({
+            authenticated: false,
+            user: undefined
+        })
+    }
+
+    onLoginSuccess(response) {
+        let idToken = response.tokenId;
+        this.performGoogleLogin(idToken);
+    }
+
     onLoginFailure(response) {
         console.log(response);
     }
 
-    onLogoutSuccess(response) {
-        console.log(response);
+    onLogoutSuccess() {
+        this.performGoogleLogout();
+    }
+
+    onLogoutFailure() {
     }
 
     render() {
         return (
             <div className="UserBox-Component">
-                {!this.state.authenticated ?
-                    <div className="wrapper login">
-                        <GoogleLogin
-                            clientId="720087900394-emhkhqeh8m9nhq1mm07td42iuihbu56i.apps.googleusercontent.com"
-                            buttonText="Login"
-                            onSuccess={this.onLoginSuccess}
-                            onFailure={this.onLoginFailure}
-                            cookiePolicy={'single_host_origin'}
-                        />
-                    </div>
+                {this.state.authenticated ?
+                    <GoogleLogout
+                        clientId="720087900394-emhkhqeh8m9nhq1mm07td42iuihbu56i.apps.googleusercontent.com"
+                        onLogoutSuccess={this.onLogoutSuccess}
+                        onLogoutFailure={this.onLogoutFailure}
+
+                        buttonText="Logout"
+                        render={renderProps => (
+                            <button onClick={renderProps.onClick} disabled={renderProps.disabled}>Log Out</button>
+                        )}
+                    />
                     :
-                    <div className="wrapper logout">
-                        <GoogleLogout
-                            buttonText="Logout"
-                            onLogoutSuccess={this.onLogoutSuccess}
-                        />
-                    </div>
+                    <GoogleLogin
+                        clientId="720087900394-emhkhqeh8m9nhq1mm07td42iuihbu56i.apps.googleusercontent.com"
+                        onSuccess={this.onLoginSuccess}
+                        onFailure={this.onLoginFailure}
+
+                        buttonText="Login"
+                        render={renderProps => (
+                            <button onClick={renderProps.onClick} disabled={renderProps.disabled}>Log In</button>
+                        )}
+                    />
                 }
             </div>
         );

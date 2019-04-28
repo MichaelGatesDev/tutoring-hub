@@ -1,38 +1,19 @@
 .UserBox-Component {
     /* border: 1px solid black; */
-    width: 120px;
+    /* width: 120px; */
     height: 100%;
+    height: 47px;
     text-align: center;
 }
 
-.UserBox-Component .wrapper {}
+.UserBox-Component .User-Info {}
 
-.UserBox-Component .wrapper a {
-    text-decoration: none;
-    color: #000000;
-}
-
-.g-signin2 {
-    height: 100%;
-}
-
-.UserBox-Component .login {
-    /* border: 1px dashed rgb(250, 110, 208); */
-}
-
-.UserBox-Component .logout {
-    border: 1px solid rgb(232, 237, 245);
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.UserBox-Component .logout p {
-    margin: 0;
-    color: #000000;
-    font-size: 0.75em;
-    width: 120px;
-    padding: 1em 0;
-    /* height: 36px; */
+.UserBox-Component button {
+    background-color: #fc6472;
+    color: #FFFFFF;
+    border: none;
+    width: 125px;
+    height: 47px;
+    border-radius: 5px;
+    cursor: pointer;
 }
