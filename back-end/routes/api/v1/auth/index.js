@@ -36,6 +36,11 @@ async function verifyLogin(idToken) {
                     locale: locale
                 };
 
+                // only allow plattsburgh emails
+                if (!email.endsWith('@plattsburgh.edu')) {
+                    return reject(new Error("Invalid email domain"));
+                }
+
                 User.findOne({
                     userID: userID
                 })
@@ -51,41 +56,27 @@ async function verifyLogin(idToken) {
                                     console.log("Created user");
                                     return resolve(createdUser);
                                 }).catch(function (err) {
-                                    console.log("Error creating user");
-                                    return reject(err);
+                                    return reject(new Error("Error creating new user: " + err));
                                 });
                         }
                     }).catch(function (err) {
-                        console.log("Error finding user: " + userID);
-                        return reject(err);
+                        return reject(new Error("Error finding user: " + err));
                     });
             })
             .catch(function (err) {
-                return reject(err);
+                return reject(new Error("Error verifying ID token: " + err));
             });
     });
 }
-
-router.get('/google/login', (req, res, next) => {
-    res.send("Google login");
-});
 
 router.post('/google/login', async (req, res, next) => {
     let token = req.body.token;
     await verifyLogin(token)
         .then(function (user) {
-            console.log("Successfully verified the login!");
             res.status(200).send(user);
         }).catch(function (err) {
-            console.log("There was an error verifying the login");
-            console.log(err);
-            res.status(400).send("Could not verify login");
+            res.status(401).send(err);
         });
-});
-
-
-router.get('/google/logout', (req, res, next) => {
-    res.send("Google logout");
 });
 
 module.exports = router;
