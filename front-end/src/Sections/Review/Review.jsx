@@ -15,6 +15,10 @@ class Review extends React.Component {
 		super(props);
 
 		this.state = {
+
+			authenticated: false,
+			user: undefined,
+
 			loading: true,
 			tutor: undefined,
 			author: "Anonymous",
@@ -36,6 +40,8 @@ class Review extends React.Component {
 
 		this.validateForm = this.validateForm.bind(this);
 		this.handleSubmit = this.handleSubmit.bind(this);
+
+		this.onAuthChange = this.onAuthChange.bind(this);
 	}
 
 	componentDidMount() {
@@ -55,6 +61,13 @@ class Review extends React.Component {
 	}
 
 	validateForm(callback) {
+
+		if (!this.state.authenticated) {
+			let msg = `You must be logged in to submit a review!`;
+			callback(msg);
+			return;
+		}
+
 		if (!this.state.course) {
 			let msg = `The course tutored must be selected!`;
 			callback(msg);
@@ -99,7 +112,7 @@ class Review extends React.Component {
 	handleSubmit = () => {
 		let self = this;
 
-		this.validateForm(function(err) {
+		this.validateForm(function (err) {
 			if (err) {
 				alert(err);
 				return;
@@ -126,7 +139,7 @@ class Review extends React.Component {
 				{
 					tutor: updatedTutor
 				},
-				function() {
+				function () {
 					fetch(`/api/v1${window.location.pathname}`.replace("/rate", ""), {
 						method: "PUT",
 						body: JSON.stringify(self.state.tutor),
@@ -220,6 +233,16 @@ class Review extends React.Component {
 		});
 	};
 
+	onAuthChange(authed, user) {
+		console.log("REVIEW | AUTHED = " + authed);
+		if (authed)
+			console.log(user);
+		this.setState({
+			authenticated: authed,
+			user: user
+		});
+	}
+
 	render() {
 		if (this.state.loading) {
 			return (
@@ -231,7 +254,10 @@ class Review extends React.Component {
 
 		return (
 			<div className={"review-section"}>
-				<NavBar />
+
+				<NavBar
+					onAuthChange={this.onAuthChange}
+				/>
 
 				{this.state.loading ? (
 					<div className="review-section--wrapper">
@@ -244,64 +270,64 @@ class Review extends React.Component {
 						</div>
 					</div>
 				) : (
-					<div className={"review-section--wrapper"}>
-						<Title title={"Rate " + this.state.tutor.firstName} />
+						<div className={"review-section--wrapper"}>
+							<Title title={"Rate " + this.state.tutor.firstName} />
 
-						<ScaleInput
-							parameter={"methodology"}
-							onChange={this.onStatUpdate}
-							scaleMin={1}
-							scaleMax={10}
-						/>
-						<ScaleInput
-							parameter={"organization"}
-							onChange={this.onStatUpdate}
-							scaleMin={1}
-							scaleMax={10}
-						/>
-						<ScaleInput
-							parameter={"preparation"}
-							onChange={this.onStatUpdate}
-							scaleMin={1}
-							scaleMax={10}
-						/>
-						<ScaleInput
-							parameter={"clarity"}
-							onChange={this.onStatUpdate}
-							scaleMin={1}
-							scaleMax={10}
-						/>
-						<ScaleInput
-							parameter={"knowledge"}
-							onChange={this.onStatUpdate}
-							scaleMin={1}
-							scaleMax={10}
-						/>
-
-						<Subheading title={"About your session"} />
-						<div>
-							<p>Would you book this tutor again? </p>
-							<YesNoInput
-								choices={["yes", "no"]}
-								onChange={this.onBookAgainUpdate}
+							<ScaleInput
+								parameter={"methodology"}
+								onChange={this.onStatUpdate}
+								scaleMin={1}
+								scaleMax={10}
 							/>
+							<ScaleInput
+								parameter={"organization"}
+								onChange={this.onStatUpdate}
+								scaleMin={1}
+								scaleMax={10}
+							/>
+							<ScaleInput
+								parameter={"preparation"}
+								onChange={this.onStatUpdate}
+								scaleMin={1}
+								scaleMax={10}
+							/>
+							<ScaleInput
+								parameter={"clarity"}
+								onChange={this.onStatUpdate}
+								scaleMin={1}
+								scaleMax={10}
+							/>
+							<ScaleInput
+								parameter={"knowledge"}
+								onChange={this.onStatUpdate}
+								scaleMin={1}
+								scaleMax={10}
+							/>
+
+							<Subheading title={"About your session"} />
+							<div>
+								<p>Would you book this tutor again? </p>
+								<YesNoInput
+									choices={["yes", "no"]}
+									onChange={this.onBookAgainUpdate}
+								/>
+							</div>
+
+							<Subheading title={"Class Tutored"} />
+							<CourseInput
+								choices={this.state.tutor.courses}
+								onChange={this.onCourseTutoredUpdate}
+							/>
+
+							<Subheading title={"Comments"} />
+							<textarea
+								onChange={this.handleComment}
+								placeholder={"How was your session? Help this tutor to improve "}
+							/>
+
+							<button onClick={this.handleSubmit}>SUBMIT REVIEW</button>
 						</div>
-
-						<Subheading title={"Class Tutored"} />
-						<CourseInput
-							choices={this.state.tutor.courses}
-							onChange={this.onCourseTutoredUpdate}
-						/>
-
-						<Subheading title={"Comments"} />
-						<textarea
-							onChange={this.handleComment}
-							placeholder={"How was your session? Help this tutor to improve "}
-						/>
-
-						<button onClick={this.handleSubmit}>SUBMIT REVIEW</button>
-					</div>
-				)}
+					)}
 			</div>
 		);
 	}

@@ -33,6 +33,8 @@ class Tutors extends Component {
 		this.resetFilters = this.resetFilters.bind(this);
 		this.filterCourses = this.filterCourses.bind(this);
 		this.filterRatings = this.filterRatings.bind(this);
+
+		this.onAuthChange = this.onAuthChange.bind(this);
 	}
 
 	componentDidMount() {
@@ -59,7 +61,7 @@ class Tutors extends Component {
 			.then(response => response.json())
 			.then(data => {
 				this.setState({
-					courses: _.sortBy(data, function(course) {
+					courses: _.sortBy(data, function (course) {
 						return course;
 					})
 				});
@@ -112,6 +114,16 @@ class Tutors extends Component {
 		);
 	}
 
+	onAuthChange(authed, user) {
+		console.log("TUTORS | AUTHED = " + authed);
+		if (authed)
+			console.log(user);
+		this.setState({
+			authenticated: authed,
+			user: user
+		});
+	}
+
 	render() {
 		return (
 			<div className="section">
@@ -119,6 +131,7 @@ class Tutors extends Component {
 					searchable={true}
 					handleSearch={this.handleSearch}
 					sticky={true}
+					onAuthChange={this.onAuthChange}
 				/>
 				<div className="section--wrapper">
 					<div className="section--wrapper-title">
@@ -160,8 +173,8 @@ class Tutors extends Component {
 							filterName={this.state.filterName}
 						/>
 					) : (
-						<TutorCards tutors={this.state.tutors} />
-					)}
+							<TutorCards tutors={this.state.tutors} />
+						)}
 
 					<div className="review-website-button">
 						<ReviewWebsiteButton />

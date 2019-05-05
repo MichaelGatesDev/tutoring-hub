@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import './UserBox.css';
 
 import { GoogleLogin, GoogleLogout } from 'react-google-login';
@@ -20,7 +20,6 @@ class UserBox extends Component {
     }
 
     componentDidMount() {
-
     }
 
     componentWillMount() {
@@ -49,6 +48,8 @@ class UserBox extends Component {
                 this.setState({
                     authenticated: true,
                     user: user
+                }, function () {
+                    this.props.onAuthChange(true, user);
                 });
             })
             .catch(error => {
@@ -67,12 +68,13 @@ class UserBox extends Component {
     }
 
     performGoogleLogout() {
-        console.log("Performing log out");
         localStorage.clear(); //TODO maybe cherry-pick
         this.setState({
             authenticated: false,
             user: undefined
-        })
+        }, function () {
+            this.props.onAuthChange(false, undefined);
+        });
     }
 
     onLoginSuccess(response) {

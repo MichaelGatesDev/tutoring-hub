@@ -19,7 +19,6 @@ import Subheading from "../../Components/Subheading/Subheading";
 import ReviewCard from "../../Components/ReviewCard/ReviewCard";
 import NoReviews from "../../Assets/no-reviews.png";
 import FormDropdown from "../../Components/FormDropdown/FormDropdown";
-import FormSlider from "../../Components/FormSlider/FormSlider";
 
 class Profile extends Component {
 	constructor(props) {
@@ -33,6 +32,8 @@ class Profile extends Component {
 			filter_rating: 0
 		};
 		this.getName = this.getName.bind(this);
+
+		this.onAuthChange = this.onAuthChange.bind(this);
 	}
 
 	getName() {
@@ -93,10 +94,22 @@ class Profile extends Component {
 			});
 	}
 
+	onAuthChange(authed, user) {
+		console.log("PROFILE | AUTHED = " + authed);
+		if (authed)
+			console.log(user);
+		this.setState({
+			authenticated: authed,
+			user: user
+		});
+	}
+
 	render() {
 		return (
 			<div className="profile-section">
-				<NavBar />
+				<NavBar
+					onAuthChange={this.onAuthChange}
+				/>
 				{this.state.loading ? (
 					<div className="profile-section--wrapper">
 						<div className="profile-section--wrapper-load">
@@ -108,98 +121,98 @@ class Profile extends Component {
 						</div>
 					</div>
 				) : (
-					<div className="profile-section--wrapper">
-						<div className="profile-section--wrapper__upper">
-							<div className={"profile-section--wrapper__upper--left"}>
-								<img src={this.state.tutor.imageUrl} alt="" />
-							</div>
-							<div className={"profile-section--wrapper__upper--center"}>
-								<Title title={this.getName()} />
-								<p className="profile-major">{this.state.tutor.major}</p>
-
-								<div className={"tutor-since"}>
-									<img src={tutorSince} alt="tutor since" />
-									<p>Tutor since {this.state.tutor.since}</p>
+						<div className="profile-section--wrapper">
+							<div className="profile-section--wrapper__upper">
+								<div className={"profile-section--wrapper__upper--left"}>
+									<img src={this.state.tutor.imageUrl} alt="" />
 								</div>
-								<section className={"tutor-rating-stats"}>
-									<div className={"tutor-rating-stats--reviews"}>
-										<img src={reviewsCount} alt="total reviews" />
-										<p>
-											<span>{this.state.tutor.reviews.length} </span>Total
-											Reviews
+								<div className={"profile-section--wrapper__upper--center"}>
+									<Title title={this.getName()} />
+									<p className="profile-major">{this.state.tutor.major}</p>
+
+									<div className={"tutor-since"}>
+										<img src={tutorSince} alt="tutor since" />
+										<p>Tutor since {this.state.tutor.since}</p>
+									</div>
+									<section className={"tutor-rating-stats"}>
+										<div className={"tutor-rating-stats--reviews"}>
+											<img src={reviewsCount} alt="total reviews" />
+											<p>
+												<span>{this.state.tutor.reviews.length} </span>Total
+												Reviews
 										</p>
-									</div>
-									<div className={"tutor-rating-stats--positive"}>
-										<img src={reviesPositive} alt="positive reviews" />
-										{isNaN(this.state.yes.toFixed(1)) ? (
-											<p>N/A</p>
-										) : (
-											<p>
-												<span>{this.state.yes.toFixed(1)} % </span>would book
-												again
+										</div>
+										<div className={"tutor-rating-stats--positive"}>
+											<img src={reviesPositive} alt="positive reviews" />
+											{isNaN(this.state.yes.toFixed(1)) ? (
+												<p>N/A</p>
+											) : (
+													<p>
+														<span>{this.state.yes.toFixed(1)} % </span>would book
+														again
 											</p>
-										)}
-									</div>
-									<div className={"tutor-rating-stats--negative"}>
-										<img src={reviewsNegative} alt="negative reviews" />
-										{isNaN(this.state.no.toFixed(1)) ? (
-											<p>N/A</p>
-										) : (
-											<p>
-												<span>{this.state.no.toFixed(1)} % </span>wouldn't book
-												again
+												)}
+										</div>
+										<div className={"tutor-rating-stats--negative"}>
+											<img src={reviewsNegative} alt="negative reviews" />
+											{isNaN(this.state.no.toFixed(1)) ? (
+												<p>N/A</p>
+											) : (
+													<p>
+														<span>{this.state.no.toFixed(1)} % </span>wouldn't book
+														again
 											</p>
-										)}
-									</div>
-								</section>
+												)}
+										</div>
+									</section>
+								</div>
+								<div className={"profile-section--wrapper__upper--right"}>
+									<RatingCard reviews={this.state.tutor.reviews} />
+								</div>
 							</div>
-							<div className={"profile-section--wrapper__upper--right"}>
-								<RatingCard reviews={this.state.tutor.reviews} />
+							<Subheading title={"Courses"} />
+							<Course courses={this.state.tutor.courses} />
+							<Subheading title={"Stats"} />
+							<Stats reviews={this.state.tutor.reviews} />
+							<div className={"profile-section--wrapper__reviews"}>
+								<Subheading title={"Reviews"} />
 							</div>
-						</div>
-						<Subheading title={"Courses"} />
-						<Course courses={this.state.tutor.courses} />
-						<Subheading title={"Stats"} />
-						<Stats reviews={this.state.tutor.reviews} />
-						<div className={"profile-section--wrapper__reviews"}>
-							<Subheading title={"Reviews"} />
-						</div>
-						<div className="Filters-course">
-							<div>
-								<span>Filters review</span>
-								<FormDropdown
-									title={"Courses"}
-									options={this.state.tutor.courses}
-									onChange={this.filterCourses}
-									value={this.state.filter_course}
-									uppercase={true}
-								/>
+							<div className="Filters-course">
+								<div>
+									<span>Filters review</span>
+									<FormDropdown
+										title={"Courses"}
+										options={this.state.tutor.courses}
+										onChange={this.filterCourses}
+										value={this.state.filter_course}
+										uppercase={true}
+									/>
+								</div>
+								<Link
+									to={`/tutors/${this.state.tutor._id}/rate`}
+									onClick={() => {
+										document.getElementById("navbar").scrollIntoView();
+									}}
+								>
+									REVIEW {this.getName().toUpperCase()}
+								</Link>
 							</div>
-							<Link
-								to={`/tutors/${this.state.tutor._id}/rate`}
-								onClick={() => {
-									document.getElementById("navbar").scrollIntoView();
-								}}
-							>
-								REVIEW {this.getName().toUpperCase()}
-							</Link>
-						</div>
-						{this.state.tutor.reviews.length === 0 ? (
-							<div className={"profile-section--wrapper__no-reviews"}>
-								<img src={NoReviews} alt="" />
-								<h3>
-									{this.state.tutor.firstName} doesn't have any reviews yet. Be
-									the first to review
+							{this.state.tutor.reviews.length === 0 ? (
+								<div className={"profile-section--wrapper__no-reviews"}>
+									<img src={NoReviews} alt="" />
+									<h3>
+										{this.state.tutor.firstName} doesn't have any reviews yet. Be
+										the first to review
 								</h3>
-							</div>
-						) : (
-							<ReviewCard
-								tutor={this.state.tutor}
-								filter_course={this.state.filter_course}
-							/>
-						)}
-					</div>
-				)}
+								</div>
+							) : (
+									<ReviewCard
+										tutor={this.state.tutor}
+										filter_course={this.state.filter_course}
+									/>
+								)}
+						</div>
+					)}
 			</div>
 		);
 	}
