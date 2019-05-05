@@ -43,7 +43,7 @@ class UserBox extends Component {
                 token: idToken
             })
         })
-            .then(response => response.json())
+            .then(this.checkStatus)
             .then(user => {
                 localStorage.setItem('idToken', idToken);
                 this.setState({
@@ -52,13 +52,23 @@ class UserBox extends Component {
                 });
             })
             .catch(error => {
-                console.log(error);
+                console.error(error);
             });
+    }
+
+    checkStatus(res) {
+        if (res.status >= 200 && res.status < 300) {
+            return res
+        } else {
+            let err = new Error(res.statusText)
+            err.response = res
+            throw err
+        }
     }
 
     performGoogleLogout() {
         console.log("Performing log out");
-        localStorage.removeItem('idToken');
+        localStorage.clear(); //TODO maybe cherry-pick
         this.setState({
             authenticated: false,
             user: undefined
